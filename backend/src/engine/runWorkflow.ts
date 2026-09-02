@@ -20,6 +20,7 @@ export async function runWorkflow(workflow: Workflow): Promise<Run> {
     };
 
     let currentNode = startNodes[0];
+    let previousOutput: unknown = undefined;
     while (true) {
         const step: Step = {
             nodeId:currentNode.id,
@@ -28,9 +29,10 @@ export async function runWorkflow(workflow: Workflow): Promise<Run> {
         run.steps.push(step);
 
         try {
-            const output = await executeNode(currentNode);
+            const output = await executeNode(currentNode, previousOutput);
             step.status = "succeeded";
             step.output = output;
+            previousOutput= output;
         } catch (error) {
             step.status = "failed";
             step.error = error instanceof Error ? error.message : String(error);

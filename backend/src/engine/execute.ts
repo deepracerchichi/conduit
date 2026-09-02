@@ -1,10 +1,12 @@
 
 import type { WorkflowNode } from "../domain/workflow.js";
+import { interpolate } from "./interpolate.js";
 
-export async function executeNode(node: WorkflowNode): Promise<unknown> {
+export async function executeNode(node: WorkflowNode, previousOutput?: unknown): Promise<unknown> {
     switch (node.config.type) {
         case "http_request":{
-            const response = await fetch(node.config.url, {
+            const url = interpolate(node.config.url, previousOutput)
+            const response = await fetch(url, {
                 method: node.config.method,
                 headers: node.config.headers
             });
@@ -18,12 +20,16 @@ export async function executeNode(node: WorkflowNode): Promise<unknown> {
         }
         
         case "llm_call":{
+            const prompt = interpolate(node.config.prompt, previousOutput)
+             console.log("--- PROMPT SENT TO OLLAMA ---");
+             console.log(prompt);
+             console.log("-----------------------------");
             const response = await fetch("http://localhost:11434/api/generate", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
                     model: "llama3.2",
-                    prompt: node.config.prompt,
+                    prompt: prompt,
                     stream: false,
                 }),
             });
