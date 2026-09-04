@@ -14,7 +14,10 @@ const testWorkflow: Workflow = {
     {
       id: "step2",
       name: "Summarize it",
-      config: { type: "llm_call", prompt: "Summarize this Hacker News post in one sentence: {{previousOutput}}" },
+      config: {
+        type: "llm_call",
+        prompt: "Here is a Hacker News post as JSON:\n\n{{previousOutput}}\n\nSummarize it in one sentence.",
+      },
     },
   ],
   edges: [{ from: "step1", to: "step2" }],
