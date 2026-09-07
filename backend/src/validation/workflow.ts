@@ -1,0 +1,24 @@
+import { z } from "zod";
+
+const nodeConfigSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("http_request"),
+    url: z.string().url(),
+    method: z.enum(["GET", "POST", "PUT", "DELETE"]),
+    headers: z.record(z.string(), z.string()).optional(),
+    body: z.unknown().optional(),
+  }),
+  z.object({
+    type: z.literal("llm_call"),
+    prompt: z.string().min(1),
+    systemPrompt: z.string().optional(),
+  }),
+]);
+
+export const createWorkflowSchema = z.object({
+  name: z.string().min(1),
+  nodes: z
+    .array(z.object({ id: z.string().min(1), name: z.string().min(1), config: nodeConfigSchema }))
+    .min(1),
+  edges: z.array(z.object({ from: z.string(), to: z.string() })),
+});
