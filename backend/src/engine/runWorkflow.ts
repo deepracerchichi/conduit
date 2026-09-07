@@ -25,15 +25,19 @@ export async function runWorkflow(workflow: Workflow): Promise<Run> {
         const step: Step = {
             nodeId:currentNode.id,
             status: "running",
+            startedAt: new Date(),
+            attempt: 1,
         };
         run.steps.push(step);
 
         try {
             const output = await executeNode(currentNode, previousOutput);
             step.status = "succeeded";
+            step.finishedAt= new Date();
             step.output = output;
             previousOutput= output;
         } catch (error) {
+            step.finishedAt =  new Date();
             step.status = "failed";
             step.error = error instanceof Error ? error.message : String(error);
             run.status = "failed";

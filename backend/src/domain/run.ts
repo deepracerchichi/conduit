@@ -7,7 +7,11 @@ export interface Step {
   status: StepStatus;
   output?: unknown;
   error?: string;
+  startedAt: Date;
+  finishedAt?: Date;    // absent while running / if it never finished
+  attempt: number;      // always 1 for now; the retry milestone increments it
 }
+
 
 export type RunStatus = "pending" | "running" | "succeeded" | "failed";
 
