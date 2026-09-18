@@ -1,15 +1,19 @@
 import type { ErrorRequestHandler } from "express";
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-  // Log the real error server-side — for you, not the client.
   console.error(err);
 
-  // If the error carries a statusCode, use it; otherwise it's an unexpected 500.
+  // 1. Translate Mongoose's "bad input" errors into our API's language.
+  if (err?.name === "CastError" || err?.name === "ValidationError") {
+    return res.status(400).json({ error: { message: "Invalid request data" } });
+  }
+
   const statusCode = typeof err?.statusCode === "number" ? err.statusCode : 500;
 
-  res.status(statusCode).json({
-    error: {
-      message: err?.message ?? "Internal Server Error",
-    },
-  });
+  // 2. Only expose the message for errors we deliberately threw (4xx).
+  //    A 500 is unexpected — never leak internal details to the client.
+  const message = statusCode < 500 ? err?.message ?? "Error" : "Internal Server Error";
+
+  return res.status(statusCode).json({ error: { message } });
 };
+

@@ -4,20 +4,20 @@ import { findStartNodes, findNextNodes } from "./graph.js";
 import { executeNode } from "./execute.js";
 
 
-export async function runWorkflow(workflow: Workflow): Promise<Run> {
-    const startNodes = findStartNodes(workflow);
+export async function runWorkflow(workflow: Workflow, runId: string): Promise<Run> {
+  const startNodes = findStartNodes(workflow);
+  if (startNodes.length !== 1) {
+    throw new Error("Only workflows with exactly one starting node are supported right now.");
+  }
 
+  const run: Run = {
+    id: runId,              // ← was crypto.randomUUID(), now passed in
+    workflowId: workflow.id,
+    status: "running",
+    steps: [],
+  };
+  // ...rest unchanged
 
-    if (startNodes.length !== 1) {
-        throw new Error("Only workflows with exactly one starting node are supported right now. ");
-    }
-
-    const run: Run = {
-        id: crypto.randomUUID(),
-        workflowId: workflow.id,
-        status: "running",
-        steps: [],
-    };
 
     let currentNode = startNodes[0];
     let previousOutput: unknown = undefined;

@@ -25,5 +25,6 @@ const testWorkflow: Workflow = {
   updatedAt: new Date(),
 };
 
-const result = await runWorkflow(testWorkflow);
+const result = await runWorkflow(testWorkflow, crypto.randomUUID());
+
 console.log(JSON.stringify(result, null, 2));
