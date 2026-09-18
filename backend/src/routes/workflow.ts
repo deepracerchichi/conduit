@@ -4,6 +4,7 @@ import { createWorkflowSchema } from "../validation/workflow.js";
 import { requireUser } from "../middleware/requireUser.js";
 import { AppError } from "../errors/AppError.js";
 import { triggerRun } from "../services/runService.js";
+import { RunModel } from "../model/runSchema.js";
 
 
 export const workflowsRouter = Router();
@@ -48,4 +49,31 @@ workflowsRouter.post("/:id/runs", async (req, res) => {
   const userId = req.userId!;
   const run = await triggerRun(userId, req.params.id);
   return res.status(201).json(run);
+});
+
+// GET /workflows/:id/runs — list every run for this workflow
+workflowsRouter.get("/:id/runs", async (req, res) => {
+  const userId = req.userId!;
+  const workflow = await WorkflowModel.findOne({ _id: req.params.id, userId });
+  if (!workflow) {
+    throw new AppError("Workflow not found", 404);
+  }
+
+  const runs = await RunModel.find({ workflowId: workflow.id }).sort({ createdAt: -1 });
+  return res.json(runs);
+});
+
+// GET /workflows/:id/runs/:runId — one run's full detail
+workflowsRouter.get("/:id/runs/:runId", async (req, res) => {
+  const userId = req.userId!;
+  const workflow = await WorkflowModel.findOne({ _id: req.params.id, userId });
+  if (!workflow) {
+    throw new AppError("Workflow not found", 404);
+  }
+
+  const run = await RunModel.findOne({ _id: req.params.runId, workflowId: workflow.id });
+  if (!run) {
+    throw new AppError("Run not found", 404);
+  }
+  return res.json(run);
 });
