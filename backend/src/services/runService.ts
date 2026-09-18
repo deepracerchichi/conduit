@@ -18,7 +18,8 @@ export async function triggerRun(userId: string, workflowId: string) {
     edges: doc.edges,
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
-  };
+    trigger: doc.trigger
+  }
 
   const runId = crypto.randomUUID();
 

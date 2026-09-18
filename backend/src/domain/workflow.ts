@@ -35,4 +35,10 @@ export interface Workflow {
   edges: WorkflowEdge[];
   createdAt: Date;
   updatedAt: Date;
+  trigger: Trigger; 
 }
+
+export type Trigger =
+  | { type: "manual" }
+  | { type: "webhook" }
+  | { type: "cron"; schedule: string };

@@ -15,10 +15,21 @@ const nodeConfigSchema = z.discriminatedUnion("type", [
   }),
 ]);
 
+const triggerSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("manual") }),
+  z.object({ type: z.literal("webhook") }),
+  z.object({ type: z.literal("cron"), schedule: z.string().min(1) }),
+]);
+
 export const createWorkflowSchema = z.object({
   name: z.string().min(1),
+  trigger: triggerSchema,
   nodes: z
     .array(z.object({ id: z.string().min(1), name: z.string().min(1), config: nodeConfigSchema }))
     .min(1),
   edges: z.array(z.object({ from: z.string(), to: z.string() })),
 });
+
+
+
+

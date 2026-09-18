@@ -23,6 +23,7 @@ const testWorkflow: Workflow = {
   edges: [{ from: "step1", to: "step2" }],
   createdAt: new Date(),
   updatedAt: new Date(),
+  trigger: {type: "manual"},
 };
 
 const result = await runWorkflow(testWorkflow, crypto.randomUUID());

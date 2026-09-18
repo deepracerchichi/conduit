@@ -20,8 +20,10 @@ workflowsRouter.post("/", async (req, res) => {
     return res.status(400).json({ error: { message: "Invalid workflow", details: parsed.error.flatten() } });
   }
 
+  
   // 3. Act
-  const workflow = await WorkflowModel.create({ userId, ...parsed.data });
+const webhookToken = parsed.data.trigger.type === "webhook" ? crypto.randomUUID() : undefined;
+const workflow = await WorkflowModel.create({ userId, ...parsed.data, webhookToken });
 
   // 4. Respond
   return res.status(201).json(workflow);

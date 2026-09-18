@@ -3,6 +3,8 @@ import express from "express";
 import { connectToDatabase } from "./db/connect.js";
 import { workflowsRouter } from "./routes/workflow.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { webhooksRouter } from "./routes/webhooks.js";
+
 
 await connectToDatabase();
 
@@ -14,6 +16,7 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 app.use("/workflows", workflowsRouter);
+app.use("/webhooks", webhooksRouter);   
 
 // --- 404: nothing above matched ---
 app.use((req, res) => {
