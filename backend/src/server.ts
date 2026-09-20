@@ -4,9 +4,11 @@ import { connectToDatabase } from "./db/connect.js";
 import { workflowsRouter } from "./routes/workflow.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { webhooksRouter } from "./routes/webhooks.js";
+import { loadCronWorkflowsFromDatabase } from "./scheduler/cronScheduler.js";
 
 
 await connectToDatabase();
+await loadCronWorkflowsFromDatabase(); 
 
 const app = express();
 app.use(express.json());
