@@ -6,6 +6,7 @@ dotenv.config();
 const envSchema = z.object({
   MONGODB_URI: z.string().url(),
   PORT: z.coerce.number().int().positive().default(5000),
+  JWT_SECRET: z.string().min(32),   // ← new
 });
 
 const parsed = envSchema.safeParse(process.env);

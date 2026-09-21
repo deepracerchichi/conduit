@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { WorkflowModel } from "../model/workflowSchema.js";
 import { createWorkflowSchema } from "../validation/workflow.js";
-import { requireUser } from "../middleware/requireUser.js";
+import { requireAuth } from "../middleware/requireAuth.js";
 import { AppError } from "../errors/AppError.js";
 import { triggerRun } from "../services/runService.js";
 import { RunModel } from "../model/runSchema.js";
@@ -9,7 +9,7 @@ import { scheduleCronWorkflow } from "../scheduler/cronScheduler.js";
 
 
 export const workflowsRouter = Router();
-workflowsRouter.use(requireUser);
+workflowsRouter.use(requireAuth);
 workflowsRouter.post("/", async (req, res) => {
   // 1. Authenticate — TODO: real JWT auth (milestone 3b)
   const userId = req.userId!; //guranteed by requireUser middleware

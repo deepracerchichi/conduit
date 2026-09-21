@@ -5,6 +5,7 @@ import { workflowsRouter } from "./routes/workflow.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { webhooksRouter } from "./routes/webhooks.js";
 import { loadCronWorkflowsFromDatabase } from "./scheduler/cronScheduler.js";
+import { authRouter } from "./routes/auth.js";
 
 
 await connectToDatabase();
@@ -17,6 +18,7 @@ app.use(express.json());
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+app.use("/auth", authRouter)
 app.use("/workflows", workflowsRouter);
 app.use("/webhooks", webhooksRouter);   
 
