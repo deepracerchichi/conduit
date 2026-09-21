@@ -5,6 +5,7 @@ import { requireUser } from "../middleware/requireUser.js";
 import { AppError } from "../errors/AppError.js";
 import { triggerRun } from "../services/runService.js";
 import { RunModel } from "../model/runSchema.js";
+import { scheduleCronWorkflow } from "../scheduler/cronScheduler.js";
 
 
 export const workflowsRouter = Router();
@@ -21,10 +22,13 @@ workflowsRouter.post("/", async (req, res) => {
   }
 
   
-  // 3. Act
+// 3. Act
 const webhookToken = parsed.data.trigger.type === "webhook" ? crypto.randomUUID() : undefined;
 const workflow = await WorkflowModel.create({ userId, ...parsed.data, webhookToken });
 
+if (workflow.trigger.type === "cron") {
+  scheduleCronWorkflow(workflow.id, workflow.userId, workflow.trigger.schedule);
+}
   // 4. Respond
   return res.status(201).json(workflow);
 });
