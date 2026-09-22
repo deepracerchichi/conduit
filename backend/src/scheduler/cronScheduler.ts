@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import type { ScheduledTask } from "node-cron";
-import { triggerRun } from "../services/runService.js";
+import { runQueue } from "../queue/runQueue.js";
 import { WorkflowModel } from "../model/workflowSchema.js";
 
 const scheduledJobs = new Map<string, ScheduledTask>();
@@ -11,10 +11,13 @@ export function scheduleCronWorkflow(workflowId: string, userId: string, schedul
   }
 
   const task = cron.schedule(schedule, () => {
-    triggerRun(userId, workflowId).catch((error) => {
-      console.error(`Cron trigger failed for workflow ${workflowId}:`, error);
-    });
+  const runId = crypto.randomUUID();
+  runQueue.add("run", { workflowId, userId, runId }).catch((error) => {
+    console.error(`Failed to enqueue cron run for workflow ${workflowId}:`, error);
   });
+});
+
+
 
   scheduledJobs.set(workflowId, task);
 }
@@ -29,3 +32,5 @@ export async function loadCronWorkflowsFromDatabase() {
     }
   }
 }
+
+

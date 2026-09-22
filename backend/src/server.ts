@@ -6,6 +6,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { webhooksRouter } from "./routes/webhooks.js";
 import { loadCronWorkflowsFromDatabase } from "./scheduler/cronScheduler.js";
 import { authRouter } from "./routes/auth.js";
+import "./queue/runWorker.js";
 
 
 await connectToDatabase();
