@@ -3,9 +3,10 @@ import { WorkflowModel } from "../model/workflowSchema.js";
 import { createWorkflowSchema } from "../validation/workflow.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { AppError } from "../errors/AppError.js";
-import { triggerRun } from "../services/runService.js";
+
 import { RunModel } from "../model/runSchema.js";
 import { scheduleCronWorkflow } from "../scheduler/cronScheduler.js";
+import { runQueue } from "../queue/runQueue.js";
 
 
 export const workflowsRouter = Router();
@@ -53,8 +54,15 @@ workflowsRouter.get("/:id", async (req, res) => {
 // POST /workflows/:id/runs — execute a workflow now
 workflowsRouter.post("/:id/runs", async (req, res) => {
   const userId = req.userId!;
-  const run = await triggerRun(userId, req.params.id);
-  return res.status(201).json(run);
+  const workflow = await WorkflowModel.findOne({ _id: req.params.id, userId });
+  if (!workflow) {
+    throw new AppError("Workflow not found", 404);
+  }
+
+  const runId = crypto.randomUUID();
+await runQueue.add("run", { workflowId: workflow.id, userId, runId });
+return res.status(202).json({ message: "Run queued", runId });
+
 });
 
 // GET /workflows/:id/runs — list every run for this workflow
