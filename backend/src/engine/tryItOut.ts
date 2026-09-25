@@ -26,6 +26,6 @@ const testWorkflow: Workflow = {
   trigger: {type: "manual"},
 };
 
-const result = await runWorkflow(testWorkflow, crypto.randomUUID());
+const result = await runWorkflow(testWorkflow, crypto.randomUUID(), new Map());
 
 console.log(JSON.stringify(result, null, 2));

@@ -1,12 +1,19 @@
 import { z } from "zod";
 
+const urlOrTemplate = z.string().refine(
+  (val) => /\{\{(previousOutput|credential)\}\}/.test(val) || z.string().url().safeParse(val).success,
+  { message: "Must be a valid URL, or contain a {{previousOutput}} / {{credential}} placeholder" }
+);
+
+
 const nodeConfigSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("http_request"),
-    url: z.string().url(),
+    url: urlOrTemplate,
     method: z.enum(["GET", "POST", "PUT", "DELETE"]),
     headers: z.record(z.string(), z.string()).optional(),
     body: z.unknown().optional(),
+    credentialId: z.string().optional(),
   }),
   z.object({
     type: z.literal("llm_call"),

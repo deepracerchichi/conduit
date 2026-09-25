@@ -7,7 +7,8 @@ const envSchema = z.object({
   MONGODB_URI: z.string().url(),
   PORT: z.coerce.number().int().positive().default(5000),
   JWT_SECRET: z.string().min(32),
-  REDIS_URL: z.url(), 
+  REDIS_URL: z.url(),
+  ENCRYPTION_KEY: z.string().length(64).regex(/^[0-9a-f]+$/i),
 });
 
 const parsed = envSchema.safeParse(process.env);
