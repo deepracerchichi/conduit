@@ -2,22 +2,43 @@
 import type { WorkflowNode } from "../domain/workflow.js";
 import { interpolate } from "./interpolate.js";
 
-export async function executeNode(node: WorkflowNode, previousOutput?: unknown): Promise<unknown> {
+export async function executeNode(node: WorkflowNode, credentialValues: Map<string, string>, previousOutput?: unknown): Promise<unknown> {
     switch (node.config.type) {
         case "http_request":{
-            const url = interpolate(node.config.url, previousOutput)
-            const response = await fetch(url, {
-                method: node.config.method,
-                headers: node.config.headers
-            });
-            if(!response.ok) {
-                throw new Error(`HTTP request failed: ${response.status} ${response.statusText}`);
-                
+            const credentialValue = node.config.credentialId
+                ? credentialValues.get(node.config.credentialId)
+                : undefined;
+
+            const url = interpolate(node.config.url, previousOutput, credentialValue);
+
+            const headers: Record<string, string> = {};
+
+            for (const [key, value] of Object.entries(node.config.headers ?? {})) {
+                headers[key] = interpolate(value, previousOutput, credentialValue);
             }
 
-            const data = await response.json();
-            return data;
-        }
+            const hasContentType = Object.keys(headers).some((k) => k.toLowerCase() === "content-type");
+            if (node.config.body !== undefined && !hasContentType) {
+                headers["Content-Type"] = "application/json";
+            }
+            
+            const response = await fetch(url, {
+                method: node.config.method,
+                headers,
+                body: node.config.body !== undefined ? JSON.stringify(node.config.body) : undefined,
+            });
+
+            if (!response.ok) {
+            throw new Error(`HTTP request failed: ${response.status} ${response.statusText}`);
+            }
+
+            const contentType = response.headers.get("content-type") ?? "";
+            if (contentType.includes("application/json")) {
+            return await response.json();
+            }
+            return await response.text();
+
+         }
         
         case "llm_call":{
             const prompt = interpolate(node.config.prompt, previousOutput)

@@ -7,6 +7,7 @@ import { webhooksRouter } from "./routes/webhooks.js";
 import { loadCronWorkflowsFromDatabase } from "./scheduler/cronScheduler.js";
 import { authRouter } from "./routes/auth.js";
 import "./queue/runWorker.js";
+import { credentialsRouter } from "./routes/credentials.js";
 
 
 await connectToDatabase();
@@ -22,7 +23,7 @@ app.get("/health", (_req, res) => {
 app.use("/auth", authRouter)
 app.use("/workflows", workflowsRouter);
 app.use("/webhooks", webhooksRouter);   
-
+app.use("/credentials", credentialsRouter);
 // --- 404: nothing above matched ---
 app.use((req, res) => {
   res.status(404).json({ error: { message: `Not found: ${req.method} ${req.originalUrl}` } });

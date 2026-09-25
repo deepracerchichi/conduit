@@ -6,6 +6,7 @@ export interface HttpRequestNodeConfig {
   method: "GET" | "POST" | "PUT" | "DELETE";
   headers?: Record<string, string>;
   body?: unknown;
+  credentialId?: string;
 }
 
 export interface LlmCallNodeConfig {
