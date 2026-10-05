@@ -4,9 +4,9 @@ import { CtaButton } from "./CtaButton";
 
 export default function Hero({ ref }: { ref?: Ref<HTMLDivElement> }) {
   return (
-    <section
-      ref={ref}
-      className="js-hero relative m-5 h-[calc(100vh-2.5rem)] w-[calc(100%-2.5rem)] overflow-hidden rounded-3xl bg-black"
+    <>
+    <div 
+      className="js-hero-bg fixed inset-5 z-0 overflow-hidden rounded-3xl bg-black"
     >
       <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover">
         <source src="/herobg2.mp4" type="video/mp4" />
@@ -14,6 +14,9 @@ export default function Hero({ ref }: { ref?: Ref<HTMLDivElement> }) {
 
       <div className="absolute inset-0 bg-black/40" />
 
+    </div>
+
+    <section ref={ref} className="js-hero relative z-10 h-screen p-5">
       <nav className="js-nav relative z-10 flex justify-between items-center p-6">
         <div>
           <img src="/Logo.svg" alt="Conduit" className="h-8 w-auto" />
@@ -41,7 +44,7 @@ export default function Hero({ ref }: { ref?: Ref<HTMLDivElement> }) {
         <span className="block">make decisions.</span>
       </div>
 
-      <div className="js-subtext-row mt-40 relative z-20 flex justify-between items-center p-10">
+      <div className="js-subtext-row mt-40 mb-20 relative z-20 flex justify-between items-center p-10">
         <div>
           <p className="text-white text-2xl text-wrap">
             Connect any API, trigger on your schedule, and let AI handle the judgment calls.
@@ -52,9 +55,17 @@ export default function Hero({ ref }: { ref?: Ref<HTMLDivElement> }) {
           <CtaButton>DISCOVER US</CtaButton>
         </div>
       </div>
-
-
     </section>
+
+    <section className="relative z-10 flex min-h-screen items-center justify-center p-10">
+      <div className="bg-white/60 px-4 py-2 rounded-md text-white">
+        What We Do
+      </div>
+    </section>
+
+
+   
+    </>
   );
 }
 
